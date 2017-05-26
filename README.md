@@ -1,3 +1,3 @@
 # Compiler-for-Tiger-in-C
 
-Course Proj. for Compiler Principls
+Course Proj. for Compiler Principles
