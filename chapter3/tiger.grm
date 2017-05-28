@@ -52,8 +52,6 @@ void yyerror(char *s)
 program : exp
         ;
 
-
-
 decs    : dec decs   
         |
         ;
@@ -62,7 +60,6 @@ dec     : tydec
         | vardec    
         | fundec
         ;
-
 
 tydec   : TYPE ID EQ ty
         ;
@@ -88,8 +85,6 @@ vardec  : VAR ID ASSIGN exp
 fundec  : FUNCTION ID LPAREN tyfields RPAREN EQ exp
         | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp
         ;
-
-
 
 exp : lvalue
     | INT       
