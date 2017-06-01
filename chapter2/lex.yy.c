@@ -578,12 +578,12 @@ char *yytext;
 #line 2 "tiger.lex"
 #include <string.h>
 #include "util.h"
-#include "y.tab.h"
+#include "tokens.h"
 #include "errormsg.h"
 
 int charPos=1;
 int isString=0;
-int yylex(void);
+
 int yywrap(void)
 {
  charPos=1;

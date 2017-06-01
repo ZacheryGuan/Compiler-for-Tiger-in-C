@@ -1,9 +1,10 @@
 %{
 #include <string.h>
 #include "util.h"
-#include "tokens.h"
+#include "symbol.h"
+#include "absyn.h"
+#include "y.tab.h"
 #include "errormsg.h"
-
 int charPos=1;
 int isString=0;
 
