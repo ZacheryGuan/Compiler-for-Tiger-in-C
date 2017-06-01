@@ -1,13 +1,14 @@
 /*
  * parse.c - Parse source file.
  */
-
 #include <stdio.h>
+#include <stdlib.h>
 #include "util.h"
 #include "symbol.h"
 #include "absyn.h"
 #include "errormsg.h"
 #include "parse.h"
+#include "prabsyn.h"
 
 extern int yyparse(void);
 extern A_exp absyn_root;
@@ -20,3 +21,5 @@ A_exp parse(string fname)
    return absyn_root;
  else return NULL;
 }
+
+
