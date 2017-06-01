@@ -141,12 +141,14 @@ void str_del(){
 }
 
 <STR>{
-    \" 				{adjust(); printf("str e.\n");yylval.sval = String(str); str_del(); BEGIN(INITIAL); if(isString==1) return STRING;}
+	/*string end*/
+	\" 				{adjust(); printf("str e.\n");yylval.sval = String(tmpString); str_del(); BEGIN(INITIAL); if(isString==1) return STRING;}
     \\n  			{adjust(); str_append('\n');}
     \\t 			{adjust(); str_append('\t');}
     \\[0-9]{3}  	{adjust(); str_append(atoi(yytext+1));}
-    \\\"    		{adjust(); str_append('\"');}
+    "\\\""   		{adjust(); str_append('\"');}
     \\\\    		{adjust(); str_append('\\');}
+    . 				{adjust(); str_append(yytext[0]);}	
 	
 	/*error escapes*/
     \\[^ntf\"\\] 	{adjust(); isString = FALSE; EM_error(EM_tokPos, "String error on '\\%c'", yytext[1]);}
@@ -154,7 +156,6 @@ void str_del(){
 	/*omit newlines*/
 	[\n\r]+			{adjust(); EM_newline();}
 	
-    . 				{adjust(); str_append(yytext[0]);}
     <<EOF>> 		{adjust(); EM_error(EM_tokPos,"String is not completed on EOF!"); str_del(); return 0;} 
 }
 

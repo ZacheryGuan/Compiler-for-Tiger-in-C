@@ -47,3 +47,8 @@ Temporary Items
 .apdisk
 chapter3/ref-tiger-yacc.txt
 chapter4/ref-ast.txt
+chapter2/tiger.win.lex
+chapter3/y.output
+chapter4/parsetest-backup.c
+chapter4/y.output
+chapter4.zip

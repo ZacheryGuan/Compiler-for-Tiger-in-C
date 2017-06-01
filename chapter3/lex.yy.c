@@ -390,11 +390,11 @@ static yyconst flex_int16_t yy_accept[121] =
         5,    3,    2,   26,    9,   10,   18,   16,    6,   17,
        15,   19,   47,    7,    8,   22,   20,   24,   46,   11,
        12,   46,   46,   46,   46,   46,   46,   46,   46,   46,
-       46,   46,   46,   13,   27,   14,   57,   56,   56,   49,
-       57,   60,   59,   59,   60,    4,    5,    1,   47,   28,
+       46,   46,   46,   13,   27,   14,   55,   57,   55,   49,
+       55,   60,   59,   59,   60,    4,    5,    1,   47,   28,
        23,   21,   25,   46,   46,   46,   46,   36,   46,   46,
        46,   46,   30,   38,   46,   46,   40,   46,   35,   46,
-       46,   46,   56,   55,   53,   55,   54,   50,   51,   59,
+       46,   46,   57,   56,   53,   56,   54,   50,   51,   59,
        58,   46,   46,   46,   39,   34,   46,   37,   42,   46,
 
        46,   44,   46,    0,   46,   46,   32,   46,   31,   45,
@@ -578,12 +578,12 @@ char *yytext;
 #line 2 "tiger.lex"
 #include <string.h>
 #include "util.h"
-#include "y.tab.h"
+#include "tokens.h"
 #include "errormsg.h"
 
 int charPos=1;
 int isString=0;
-int yylex(void);
+
 int yywrap(void)
 {
  charPos=1;
@@ -1185,88 +1185,89 @@ case YY_STATE_EOF(INITIAL):
 	YY_BREAK
 
 
+/*string end*/
 case 49:
 YY_RULE_SETUP
-#line 144 "tiger.lex"
-{adjust(); printf("str e.\n");yylval.sval = String(str); str_del(); BEGIN(INITIAL); if(isString==1) return STRING;}
+#line 145 "tiger.lex"
+{adjust(); printf("str e.\n");yylval.sval = String(tmpString); str_del(); BEGIN(INITIAL); if(isString==1) return STRING;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 145 "tiger.lex"
+#line 146 "tiger.lex"
 {adjust(); str_append('\n');}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 146 "tiger.lex"
+#line 147 "tiger.lex"
 {adjust(); str_append('\t');}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 147 "tiger.lex"
+#line 148 "tiger.lex"
 {adjust(); str_append(atoi(yytext+1));}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 148 "tiger.lex"
+#line 149 "tiger.lex"
 {adjust(); str_append('\"');}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 149 "tiger.lex"
+#line 150 "tiger.lex"
 {adjust(); str_append('\\');}
 	YY_BREAK
-/*error escapes*/
 case 55:
-/* rule 55 can match eol */
 YY_RULE_SETUP
-#line 152 "tiger.lex"
-{adjust(); isString = FALSE; EM_error(EM_tokPos, "String error on '\\%c'", yytext[1]);}
+#line 151 "tiger.lex"
+{adjust(); str_append(yytext[0]);}	
 	YY_BREAK
-/*omit newlines*/
+/*error escapes*/
 case 56:
 /* rule 56 can match eol */
 YY_RULE_SETUP
-#line 155 "tiger.lex"
-{adjust(); EM_newline();}
+#line 154 "tiger.lex"
+{adjust(); isString = FALSE; EM_error(EM_tokPos, "String error on '\\%c'", yytext[1]);}
 	YY_BREAK
+/*omit newlines*/
 case 57:
+/* rule 57 can match eol */
 YY_RULE_SETUP
 #line 157 "tiger.lex"
-{adjust(); str_append(yytext[0]);}
+{adjust(); EM_newline();}
 	YY_BREAK
 case YY_STATE_EOF(STR):
-#line 158 "tiger.lex"
+#line 159 "tiger.lex"
 {adjust(); EM_error(EM_tokPos,"String is not completed on EOF!"); str_del(); return 0;} 
 	YY_BREAK
 
 
 case 58:
 YY_RULE_SETUP
-#line 162 "tiger.lex"
+#line 163 "tiger.lex"
 {adjust(); printf("com e.\n"); BEGIN(INITIAL);}
 	YY_BREAK
 case 59:
 /* rule 59 can match eol */
 YY_RULE_SETUP
-#line 163 "tiger.lex"
+#line 164 "tiger.lex"
 {adjust(); EM_newline(); continue;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 164 "tiger.lex"
+#line 165 "tiger.lex"
 {adjust();} 
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 165 "tiger.lex"
+#line 166 "tiger.lex"
 {adjust(); EM_error(EM_tokPos,"Comment is not completed on EOF"); return 0;}
 	YY_BREAK
 
 case 61:
 YY_RULE_SETUP
-#line 168 "tiger.lex"
+#line 169 "tiger.lex"
 ECHO;
 	YY_BREAK
-#line 1270 "lex.yy.c"
+#line 1271 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2265,7 +2266,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 168 "tiger.lex"
+#line 169 "tiger.lex"
 
 
 
