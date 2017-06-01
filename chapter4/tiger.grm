@@ -1,9 +1,9 @@
 %{
 #include <stdio.h>
 #include "util.h"
-#include "symbol.h" 
-#include "errormsg.h"
+#include "symbol.h"
 #include "absyn.h"
+#include "errormsg.h"
 
 int yylex(void); /* function prototype */
 
@@ -69,6 +69,7 @@ void yyerror(char *s)
 %type <decList> decs
 %type <efieldList> efieldlist
 %type <exp> exp program funcall
+
 /*
   seq seperated with ;
   list seperated with ,
@@ -204,8 +205,10 @@ exp : lvalue            {$$ = A_VarExp(EM_tokPos, $1);}
     | LET decs IN END           {$$ = A_LetExp(EM_tokPos, $2, A_SeqExp(EM_tokPos, NULL));}
 	| LET decs IN expseq END	{$$ = A_LetExp(EM_tokPos, $2, A_SeqExp(EM_tokPos, $4));}
 
+	/*
     | LPAREN error RPAREN   {$$ = A_SeqExp(EM_tokPos, NULL);}
 	| error SEMICOLON exp	{$$ = $3;}
+	*/
     ;
 
 expseq  : exp                   {$$ = A_ExpList($1, NULL);}
