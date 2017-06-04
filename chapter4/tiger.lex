@@ -21,9 +21,9 @@ void adjust(void)
 
 /*functions to deal with string def*/
 #define STRBLOCKLENGTH 1024
-static char *strPointer = NULL;
-static char *tmpString=NULL;
-static int remainSpace=STRBLOCKLENGTH;
+char *strPointer = NULL;
+char *tmpString=NULL;
+int remainSpace=STRBLOCKLENGTH;
 
 /*initialize*/
 void str(){
@@ -115,22 +115,22 @@ void str_del(){
 	"|"  		{adjust(); return OR;}
 	":=" 		{adjust(); return ASSIGN;}
 	array   	{adjust(); return ARRAY;}
-	if      	{adjust(); return IF;}
-	then    	{adjust(); return THEN;}
-	else    	{adjust(); return ELSE;}
-	while   	{adjust(); return WHILE;}
-	for     	{adjust(); return FOR;}
-	to      	{adjust(); return TO;}
-	do      	{adjust(); return DO;}
-	let     	{adjust(); return LET;}
-	in      	{adjust(); return IN;}
-	end     	{adjust(); return END;}
-	of      	{adjust(); return OF;}
 	break   	{adjust(); return BREAK;}
-	nil     	{adjust(); return NIL;}
+	do      	{adjust(); return DO;}
+	else    	{adjust(); return ELSE;}
+	end     	{adjust(); return END;}
+	for     	{adjust(); return FOR;}
 	function	{adjust(); return FUNCTION;}
-	var     	{adjust(); return VAR;}
+	if      	{adjust(); return IF;}
+	in      	{adjust(); return IN;}
+	let     	{adjust(); return LET;}
+	nil     	{adjust(); return NIL;}
+	of      	{adjust(); return OF;}
+	then    	{adjust(); return THEN;}
+	to      	{adjust(); return TO;}
 	type    	{adjust(); return TYPE;}
+	var     	{adjust(); return VAR;}
+	while   	{adjust(); return WHILE;}
 
 	/*String(char *s) is defined in util.h, used to allocate memory to given string s, and then return it.*/
 	[a-zA-Z]+[a-zA-Z0-9_]*  {adjust(); yylval.sval = String(yytext); return ID;}
@@ -143,7 +143,9 @@ void str_del(){
 <STR>{
 	/*string end*/
 	\" 				{adjust(); printf("str e.\n");yylval.sval = String(tmpString); str_del(); BEGIN(INITIAL); if(isString==1) return STRING;}
+	\\b  			{adjust(); str_append('\b');}
     \\n  			{adjust(); str_append('\n');}
+    \\r  			{adjust(); str_append('\r');}
     \\t 			{adjust(); str_append('\t');}
     \\[0-9]{3}  	{adjust(); str_append(atoi(yytext+1));}
     "\\\""   		{adjust(); str_append('\"');}
@@ -153,7 +155,10 @@ void str_del(){
 	/*error escapes*/
     \\[^ntf\"\\] 	{adjust(); isString = FALSE; EM_error(EM_tokPos, "String error on '\\%c'", yytext[1]);}
     
-	/*omit newlines*/
+    /*multiple lines*/
+    "\\f[\r\n\t ]*f\\"	{adjust(); }
+
+	/*omit empty lines*/
 	[\n\r]+			{adjust(); EM_newline();}
 	
     <<EOF>> 		{adjust(); EM_error(EM_tokPos,"String is not completed on EOF!"); str_del(); return 0;} 
