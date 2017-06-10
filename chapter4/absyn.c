@@ -2,44 +2,51 @@
  * absyn.c - Abstract Syntax Functions. Most functions create an instance of an
  *           abstract syntax rule.
  */
-
+#include <stdio.h>
 #include "util.h"
 #include "symbol.h" /* symbol table data structures */
 #include "absyn.h"  /* abstract syntax data structures */
 
+/*
+ S_symbol => a pointer to struct {string name; S_symbol}; IN A WORD one node of a list
+ */
 A_var A_SimpleVar(A_pos pos, S_symbol sym)
-{A_var p = checked_malloc(sizeof(*p));
- p->kind=A_simpleVar;
- p->pos=pos;
- p->u.simple=sym;
- return p;
+{
+	A_var p = checked_malloc(sizeof(*p));
+	p->kind = A_simpleVar;
+    p->pos = pos;
+    p->u.simple = sym;
+    return p;
 }
 
 A_var A_FieldVar(A_pos pos, A_var var, S_symbol sym)
-{A_var p = checked_malloc(sizeof(*p));
- p->kind=A_fieldVar;
- p->pos=pos;
- p->u.field.var=var;
- p->u.field.sym=sym;
- return p;
+{
+	A_var p = checked_malloc(sizeof(*p));
+	p->kind=A_fieldVar;
+	p->pos=pos;
+	p->u.field.var=var;
+	p->u.field.sym=sym;
+	return p;
 }
 
 A_var A_SubscriptVar(A_pos pos, A_var var, A_exp exp)
-{A_var p = checked_malloc(sizeof(*p));
- p->kind=A_subscriptVar;
- p->pos=pos;
- p->u.subscript.var=var;
- p->u.subscript.exp=exp;
- return p;
+{
+	A_var p = checked_malloc(sizeof(*p));
+	p->kind=A_subscriptVar;
+	p->pos=pos;
+	p->u.subscript.var=var;
+	p->u.subscript.exp=exp;
+	return p;
 }
 
 
 A_exp A_VarExp(A_pos pos, A_var var)
-{A_exp p = checked_malloc(sizeof(*p));
- p->kind=A_varExp;
- p->pos=pos;
- p->u.var=var;
- return p;
+{
+	A_exp p = checked_malloc(sizeof(*p));
+	p->kind=A_varExp;
+	p->pos=pos;
+	p->u.var=var;
+	return p;
 }
 
 A_exp A_NilExp(A_pos pos)
@@ -55,6 +62,15 @@ A_exp A_IntExp(A_pos pos, int i)
  p->pos=pos;
  p->u.intt=i;
  return p;
+}
+
+A_exp A_DoubleExp(A_pos pos, double d)
+{
+	A_exp p = checked_malloc(sizeof(*p));
+	p->kind = A_doubleExp;
+	p->pos  = pos;
+	p->u.doublee = d;
+	return p;
 }
 
 A_exp A_StringExp(A_pos pos, string s)
@@ -131,13 +147,40 @@ A_exp A_WhileExp(A_pos pos, A_exp test, A_exp body)
 
 A_exp A_ForExp(A_pos pos, S_symbol var, A_exp lo, A_exp hi, A_exp body)
 {A_exp p = checked_malloc(sizeof(*p));
- p->kind=A_forExp;
- p->pos=pos;
- p->u.forr.var=var;
- p->u.forr.lo=lo;
- p->u.forr.hi=hi;
- p->u.forr.body=body;
- p->u.forr.escape=TRUE;
+ //p->kind=A_forExp;
+ //p->pos=pos;
+ //p->u.forr.var=var;
+ //p->u.forr.lo=lo;
+ //p->u.forr.hi=hi;
+ //p->u.forr.body=body;
+ //p->u.forr.escape=TRUE;
+ /*convert to while*/
+  p->kind=A_letExp;
+  p->pos=pos;
+
+  /*declare lower and higher bound*/
+  A_dec lowBound = A_VarDec(pos, var, S_Symbol("int"), lo);
+  A_dec highBound = A_VarDec(pos, S_Symbol("hi@"), S_Symbol("int"), hi);
+  A_decList highDec = A_DecList(highBound, NULL);
+  A_decList decs = A_DecList(lowBound, highDec);
+
+  /*test condition*/
+  A_exp current = A_VarExp(pos, A_SimpleVar(pos, var));
+  A_exp highBoundExp = A_VarExp(pos, A_SimpleVar(pos, S_Symbol("hi@")));
+  A_exp compare = A_OpExp(pos, A_leOp, current, highBoundExp);
+
+  /*body*/
+  /*i++*/
+  A_exp increase = A_AssignExp(pos, A_SimpleVar(pos, var), A_OpExp(pos, A_plusOp, A_VarExp(pos, A_SimpleVar(pos, var)), A_IntExp(pos, 1)));
+  A_expList incExpList = A_ExpList(increase, NULL);
+  /*combine body with i++*/
+  A_expList bodyIncExpList = A_ExpList(body, incExpList);
+  A_exp bodyIncExp = A_SeqExp(pos, bodyIncExpList);
+
+  A_exp whileExp = A_WhileExp(pos, compare, bodyIncExp);
+
+  p->u.let.decs = decs;
+  p->u.let.body = whileExp;
  return p;
 }
 
@@ -241,9 +284,8 @@ A_expList A_ExpList(A_exp head, A_expList tail)
  return p;
 }
 
-A_fundec A_Fundec(A_pos pos, S_symbol name, A_fieldList params, S_symbol result,
-		  A_exp body)
-{A_fundec p = checked_malloc(sizeof(*p));
+A_fundec A_Fundec(A_pos pos, S_symbol name, A_fieldList params, S_symbol result, A_exp body){
+ A_fundec p = checked_malloc(sizeof(*p));
  p->pos=pos;
  p->name=name;
  p->params=params;
